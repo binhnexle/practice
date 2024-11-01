@@ -9,7 +9,7 @@ import { AssetTypes, LocationTypes } from '@src/utils/types';
 @Controller('assets')
 export class AssetsController {
    constructor(private readonly assetsService: AssetsService) {}
-   @ApiOkResponse({ description: 'Get locations successful' })
+   @ApiOkResponse({ description: 'Get assets successful' })
    @Get()
    getAssets(): Promise<HttpResponse<AssetTypes[]>> {
       return this.assetsService.getAssets();
