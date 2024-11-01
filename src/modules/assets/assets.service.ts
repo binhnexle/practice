@@ -24,7 +24,7 @@ export class AssetsService {
       fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf-8');
    }
 
-   @Cron('20 21 * * *')
+   @Cron('47 22 * * *')
    private async asyncAssets(): Promise<any> {
       this.loadData();
 
@@ -42,14 +42,17 @@ export class AssetsService {
             for (const asset of originalAssets?.data) {
                const updatedTimestamp = Math.floor(new Date(asset.updated_at).getTime() / 1000);
 
+               //Check location already exists in db and location's status is active and assets updated once a day ago.
                if (
                   existedLocationIds.includes(asset.location_id) &&
                   updatedTimestamp >= onceADayAgoTimestamp &&
-                  asset.status === 'actived'
+                  this.data.locations.find((l) => l.id === asset.location_id)?.status === 'actived'
                ) {
+                  //Check existed if asset is updated, the old asset will be deleted in db
                   if (existedAssetIds.includes(asset.id)) {
                      this.data.assets.filter((a) => a.id !== asset.id);
                   }
+
                   syncedAssets.push(asset as AssetTypes);
                }
             }
@@ -59,6 +62,7 @@ export class AssetsService {
          this.logger.log('Assets synced successfully');
       } catch (error) {
          const errorMessage = ' Assets synced failed';
+
          this.logger.log(errorMessage);
 
          return new HttpResponse(
